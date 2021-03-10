@@ -1,17 +1,24 @@
 <template>
-  <div class="hello">
-    <div class="columns is-mobile" v-for="item in 10" :key="item">
-      <div class="column is-one-quarter list-item">
-        <code>is-one-quarter</code>
-      </div>
-      <div class="column list-item">Auto</div>
+  <div class="main-page">
+    <div class="nav-bar">
+      <navBar></navBar>
+    </div>
+    <div class="content">
+      <content></content>
     </div>
   </div>
 </template>
 
 <script>
+import navBar from "./nav/navBar";
+import content from "./content/content";
+
 export default {
-  name: 'HelloWorld',
+  name: "mainPage",
+  components: {
+    navBar,
+    content
+  },
   props: {
     msg: String,
   },
@@ -20,7 +27,14 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
-.hello {
+.main-page {
   color: $primary;
+  .nav-bar {
+    height: 3.25rem;
+  }
+  .content {
+    height:calc(100vh - 3.25rem);
+        overflow-y: auto;
+  }
 }
 </style>
