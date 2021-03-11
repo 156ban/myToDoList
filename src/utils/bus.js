@@ -1,3 +1,2 @@
-import { createApp } from 'vue'
-const bus = createApp()
-export default bus 
+import mitt from 'mitt';
+export default mitt();
