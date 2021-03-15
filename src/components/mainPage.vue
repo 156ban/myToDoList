@@ -4,20 +4,20 @@
       <navBar></navBar>
     </div>
     <div class="content">
-      <content></content>
+      <content-tmp></content-tmp>
     </div>
   </div>
 </template>
 
 <script>
 import navBar from "./nav/navBar";
-import content from "./content/content";
+import contentTmp from "./content/content";
 
 export default {
   name: "mainPage",
   components: {
     navBar,
-    content
+    contentTmp
   },
   props: {
     msg: String,

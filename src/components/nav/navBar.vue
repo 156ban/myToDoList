@@ -43,7 +43,7 @@ export default {
   },
   methods: {
     changePage() {
-      bus.emit('change-page', 0); //0:未完成，1:已完成
+      bus.$emit('change-page', 0); //0:未完成，1:已完成
     },
     closeOption(e) {
       this.isOpenMenue = false;
