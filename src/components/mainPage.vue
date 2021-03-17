@@ -17,7 +17,7 @@ export default {
   name: "mainPage",
   components: {
     navBar,
-    contentTmp
+    contentTmp,
   },
   props: {
     msg: String,
@@ -33,8 +33,9 @@ export default {
     height: 3.25rem;
   }
   .content {
-    height:calc(100vh - 3.25rem);
-        overflow-y: auto;
+    height: calc(100vh - 3.25rem);
+    background-color: hsl(0, 0%, 90%);
+    overflow-y: auto;
   }
 }
 </style>
