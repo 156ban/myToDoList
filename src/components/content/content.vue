@@ -1,22 +1,13 @@
 <template>
   <div id="app-content">
-    <draggable
-      v-model="myArray"
-      group="people"
-      v-bind="dragOptions"
-      @start="drag = true"
-      @end="drag = false"
-      handle=".handle"
-    >
+    <draggable v-model="myArray" group="people" v-bind="dragOptions" @start="drag = true" @end="drag = false" handle=".handle">
       <transition-group type="transition" :name="!drag ? 'flip-list' : null">
         <div class="block do-list-item" v-for="item in myArray" :key="item.id">
           <div class="container">
             <div class="notification">
               <input type="radio" class="radio" />
               <span>
-                <textarea class="textarea has-fixed-size is-small item-input">
-This content is readonly</textarea
-                >
+                <textarea class="textarea has-fixed-size is-small item-input" v-model="item.name"></textarea>
               </span>
               <div class="drag-area handle"></div>
             </div>
@@ -28,10 +19,10 @@ This content is readonly</textarea
 </template>
 
 <script>
-import draggable from "vuedraggable";
+import draggable from 'vuedraggable';
 
 export default {
-  name: "HelloWorld",
+  name: 'HelloWorld',
   components: {
     draggable,
   },
@@ -41,16 +32,16 @@ export default {
   data() {
     return {
       myArray: [
-        { id: 1, name: "1" },
-        { id: 2, name: "2" },
-        { id: 3, name: "3" },
-        { id: 4, name: "4" },
-        { id: 5, name: "5" },
-        { id: 6, name: "6" },
-        { id: 7, name: "7" },
-        { id: 8, name: "8" },
-        { id: 9, name: "9" },
-        { id: 10, name: "10" },
+        { id: 1, name: '1' },
+        { id: 2, name: '2' },
+        { id: 3, name: '3' },
+        { id: 4, name: '4' },
+        { id: 5, name: '5' },
+        { id: 6, name: '6' },
+        { id: 7, name: '7' },
+        { id: 8, name: '8' },
+        { id: 9, name: '9' },
+        { id: 10, name: '10' },
       ],
       drag: false,
       activeItem: null,
@@ -60,11 +51,36 @@ export default {
     dragOptions() {
       return {
         animation: 200,
-        group: "description",
+        group: 'description',
         disabled: false,
-        ghostClass: "ghost",
+        ghostClass: 'ghost',
       };
     },
+  },
+  watch: {},
+  methods: {
+    addItem() {
+      this.myArray.push({ id: Symbol(), status: false, test: '新事件' });
+    },
+    delItem(index) {
+      this.myArray.splice(index, 1);
+    },
+    saveData() {
+      localStorage.setItem('myArray', JSON.stringify(this.myArray));
+    },
+  },
+  created() {
+    const data = JSON.parse(localStorage.getItem('myArray'));
+    console.log(data);
+    if (data) {
+      this.myArray = data;
+    }
+
+    window.removeEventListener('beforeunload', (e) => this.saveData(e));
+    window.removeEventListener('unload', (e) => this.saveData(e));
+
+    window.addEventListener('beforeunload', (e) => this.saveData(e));
+    window.addEventListener('unload', (e) => this.saveData(e));
   },
 };
 </script>
