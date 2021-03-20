@@ -6,9 +6,8 @@
           <div class="container">
             <div class="notification">
               <input type="radio" class="radio" />
-              <span>
+              <pre class="pre" >{{item.name}}</pre>
                 <textarea class="textarea has-fixed-size is-small item-input" v-model="item.name"></textarea>
-              </span>
               <div class="drag-area handle"></div>
             </div>
           </div>
@@ -71,7 +70,6 @@ export default {
   },
   created() {
     const data = JSON.parse(localStorage.getItem('myArray'));
-    console.log(data);
     if (data) {
       this.myArray = data;
     }
@@ -128,8 +126,19 @@ export default {
     color: $primary;
     font-size: 1.2rem;
     padding: 0;
-    height: 4rem;
-    min-height: 0;
+    position:absolute;
+    top:0;
+    left:0;
+    height:100%;
+    outline:0;
+    resize:none;
+    min-height: 2rem;
+    padding: 1.25rem 2.5rem 1.25rem 1.5rem;
+  }
+
+  pre {
+     display:block;
+    visibility:hidden;
   }
 }
 </style>
