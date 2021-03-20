@@ -1,11 +1,20 @@
 <template>
-  <nav class="navbar is-warning app-navbar" role="navigation" aria-label="main navigation" id="app-navbar">
+  <nav
+    class="navbar is-warning app-navbar"
+    role="navigation"
+    aria-label="main navigation"
+    id="app-navbar"
+  >
     <div class="navbar-brand">
       <div class="navbar-item">
         <span class="title-text">toDoList</span>
       </div>
 
-      <a role="button" class="navbar-burger" @click="isOpenMenue = !isOpenMenue">
+      <a
+        role="button"
+        class="navbar-burger"
+        @click="isOpenMenue = !isOpenMenue"
+      >
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
@@ -13,18 +22,28 @@
     </div>
 
     <div class="navbar-menu" style="display: block" v-show="isOpenMenue">
-      <div class="navbar-start" ref="menu" @click="isOpenMenue = false">
-        <a class="navbar-item" @click="changePage(0)"> 未完成 </a>
-        <a class="navbar-item" @click="changePage(1)"> 已完成 </a>
-        <a class="navbar-item" @click="changePage(2)"> 全部 </a>
+      <div
+        class="navbar-start is-horizontal"
+        ref="menu"
+        @click="isOpenMenue = false"
+      >
+        <a class="navbar-item is-warning button" @click="changePage(0)">
+          未完成
+        </a>
+        <a class="navbar-item is-success button" @click="changePage(1)">
+          已完成
+        </a>
+        <a class="navbar-item is-primary button" @click="changePage(2)">
+          全部
+        </a>
       </div>
     </div>
   </nav>
 </template>
 
 <script>
-import bus from '@/utils/bus';
-import { isParent } from '@/utils/dom';
+import bus from "@/utils/bus";
+import { isParent } from "@/utils/dom";
 
 export default {
   props: {
@@ -38,17 +57,17 @@ export default {
   watch: {
     isOpenMenue(val) {
       if (val) {
-        document.addEventListener('click', this.closeOption, true);
+        document.addEventListener("click", this.closeOption, true);
       }
     },
   },
   methods: {
     changePage() {
-      bus.$emit('change-page', 0); //0:未完成，1:已完成，2：全部
+      bus.$emit("change-page", 0); //0:未完成，1:已完成，2：全部
     },
     closeOption(e) {
       this.isOpenMenue = false;
-      document.removeEventListener('click', this.closeOption, true);
+      document.removeEventListener("click", this.closeOption, true);
       let dom = this.$refs.menu;
       if (!isParent(e.target, dom)) {
         if (e && e.stopPropagation) {
@@ -72,6 +91,17 @@ export default {
   .navbar-menu {
     position: absolute;
     width: 100%;
+    padding: 0;
+    .navbar-start {
+      display: flex;
+      .navbar-item {
+        flex-grow: 1;
+        text-align: center;
+        width: 33.3%;
+        border-radius: 0;
+        color: #fff;
+      }
+    }
   }
 }
 </style>

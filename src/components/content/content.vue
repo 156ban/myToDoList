@@ -22,6 +22,9 @@
             </div>
           </div>
         </div>
+        <div class="block do-list-item add-item" :key="-1">
+          <button class="button is-success" @click="addItem">ADD</button>
+        </div>
       </transition-group>
     </draggable>
   </div>
@@ -30,30 +33,20 @@
 <script>
 import draggable from "vuedraggable";
 import radioCustom from "../elements/radio.vue";
+import bus from "@/utils/bus";
 
 export default {
   name: "HelloWorld",
   components: {
     draggable,
-    radioCustom
+    radioCustom,
   },
   props: {
     msg: String,
   },
   data() {
     return {
-      myArray: [
-        { id: 1, text: "1" , status: false},
-        { id: 2, text: "2" , status: false},
-        { id: 3, text: "3" , status: false},
-        { id: 4, text: "4" , status: false},
-        { id: 5, text: "5" , status: false},
-        { id: 6, text: "6" , status: false},
-        { id: 7, text: "7" , status: false},
-        { id: 8, text: "8" , status: false},
-        { id: 9, text: "9" , status: false},
-        { id: 10, text: "10" , status: false},
-      ],
+      myArray: [],
       drag: false,
       activeItem: null,
     };
@@ -65,19 +58,32 @@ export default {
         group: "description",
         disabled: false,
         ghostClass: "ghost",
+        pageStatus: 0, //0:未完成，1:已完成，2：全部
       };
     },
   },
   watch: {},
   methods: {
     addItem() {
-      this.myArray.push({ id: Symbol(), status: false, test: "新事件" });
+      const id = this.getNewId();
+      this.myArray.push({ id, status: false, text: "新事件" });
     },
     delItem(index) {
       this.myArray.splice(index, 1);
     },
     saveData() {
       localStorage.setItem("myArray", JSON.stringify(this.myArray));
+    },
+    getNewId() {
+      for (let i = 0; i < 10000; i++) {
+        if (
+          !this.myArray.some((item) => {
+            item.id === i;
+          })
+        ) {
+          return i;
+        }
+      }
     },
   },
   created() {
@@ -91,6 +97,10 @@ export default {
 
     window.addEventListener("beforeunload", (e) => this.saveData(e));
     window.addEventListener("unload", (e) => this.saveData(e));
+
+    bus.$on("change-page", (value) => {
+      this.pageStatus = value;
+    });
   },
 };
 </script>
@@ -100,6 +110,7 @@ export default {
 #app-content {
   background-color: hsl(0, 0%, 90%);
   padding: 0.1rem;
+  margin-bottom: 8rem;
   .do-list-item {
     margin: 0.4rem;
   }
@@ -154,6 +165,16 @@ export default {
     padding: 0;
     margin: 0;
     min-height: 2rem;
+  }
+
+  .add-item {
+    .button {
+      height: 3rem;
+      line-height: 3rem;
+      padding: 0;
+      font-size: 1.2rem;
+      width: 100%;
+    }
   }
 }
 </style>
