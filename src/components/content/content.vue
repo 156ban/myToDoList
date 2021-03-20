@@ -1,13 +1,23 @@
 <template>
   <div id="app-content">
-    <draggable v-model="myArray" group="people" v-bind="dragOptions" @start="drag = true" @end="drag = false" handle=".handle">
+    <draggable
+      v-model="myArray"
+      group="people"
+      v-bind="dragOptions"
+      @start="drag = true"
+      @end="drag = false"
+      handle=".handle"
+    >
       <transition-group type="transition" :name="!drag ? 'flip-list' : null">
         <div class="block do-list-item" v-for="item in myArray" :key="item.id">
           <div class="container">
             <div class="notification">
-              <input type="radio" class="radio" />
-              <pre class="pre" >{{item.name}}</pre>
-                <textarea class="textarea has-fixed-size is-small item-input" v-model="item.name"></textarea>
+              <radio-custom v-model="item.status"></radio-custom>
+              <pre class="pre">{{ item.text }}</pre>
+              <textarea
+                class="textarea has-fixed-size is-small item-input"
+                v-model="item.text"
+              ></textarea>
               <div class="drag-area handle"></div>
             </div>
           </div>
@@ -18,12 +28,14 @@
 </template>
 
 <script>
-import draggable from 'vuedraggable';
+import draggable from "vuedraggable";
+import radioCustom from "../elements/radio.vue";
 
 export default {
-  name: 'HelloWorld',
+  name: "HelloWorld",
   components: {
     draggable,
+    radioCustom
   },
   props: {
     msg: String,
@@ -31,16 +43,16 @@ export default {
   data() {
     return {
       myArray: [
-        { id: 1, name: '1' },
-        { id: 2, name: '2' },
-        { id: 3, name: '3' },
-        { id: 4, name: '4' },
-        { id: 5, name: '5' },
-        { id: 6, name: '6' },
-        { id: 7, name: '7' },
-        { id: 8, name: '8' },
-        { id: 9, name: '9' },
-        { id: 10, name: '10' },
+        { id: 1, text: "1" , status: false},
+        { id: 2, text: "2" , status: false},
+        { id: 3, text: "3" , status: false},
+        { id: 4, text: "4" , status: false},
+        { id: 5, text: "5" , status: false},
+        { id: 6, text: "6" , status: false},
+        { id: 7, text: "7" , status: false},
+        { id: 8, text: "8" , status: false},
+        { id: 9, text: "9" , status: false},
+        { id: 10, text: "10" , status: false},
       ],
       drag: false,
       activeItem: null,
@@ -50,35 +62,35 @@ export default {
     dragOptions() {
       return {
         animation: 200,
-        group: 'description',
+        group: "description",
         disabled: false,
-        ghostClass: 'ghost',
+        ghostClass: "ghost",
       };
     },
   },
   watch: {},
   methods: {
     addItem() {
-      this.myArray.push({ id: Symbol(), status: false, test: '新事件' });
+      this.myArray.push({ id: Symbol(), status: false, test: "新事件" });
     },
     delItem(index) {
       this.myArray.splice(index, 1);
     },
     saveData() {
-      localStorage.setItem('myArray', JSON.stringify(this.myArray));
+      localStorage.setItem("myArray", JSON.stringify(this.myArray));
     },
   },
   created() {
-    const data = JSON.parse(localStorage.getItem('myArray'));
+    const data = JSON.parse(localStorage.getItem("myArray"));
     if (data) {
       this.myArray = data;
     }
 
-    window.removeEventListener('beforeunload', (e) => this.saveData(e));
-    window.removeEventListener('unload', (e) => this.saveData(e));
+    window.removeEventListener("beforeunload", (e) => this.saveData(e));
+    window.removeEventListener("unload", (e) => this.saveData(e));
 
-    window.addEventListener('beforeunload', (e) => this.saveData(e));
-    window.addEventListener('unload', (e) => this.saveData(e));
+    window.addEventListener("beforeunload", (e) => this.saveData(e));
+    window.addEventListener("unload", (e) => this.saveData(e));
   },
 };
 </script>
@@ -103,12 +115,11 @@ export default {
     background: #c8ebfb;
   }
 
-  .radio {
+  .radio-custom {
     position: absolute;
-    width: 1rem;
-    height: 1rem;
-    left: 0.5rem;
-    top: 0.5rem;
+    left: 0.2rem;
+    top: 0.2rem;
+    z-index: 2;
   }
 
   .drag-area {
@@ -126,19 +137,23 @@ export default {
     color: $primary;
     font-size: 1.2rem;
     padding: 0;
-    position:absolute;
-    top:0;
-    left:0;
-    height:100%;
-    outline:0;
-    resize:none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    outline: 0;
+    resize: none;
     min-height: 2rem;
     padding: 1.25rem 2.5rem 1.25rem 1.5rem;
   }
 
   pre {
-     display:block;
-    visibility:hidden;
+    display: block;
+    visibility: hidden;
+    font-size: 1.2rem;
+    padding: 0;
+    margin: 0;
+    min-height: 2rem;
   }
 }
 </style>

@@ -16,6 +16,7 @@
       <div class="navbar-start" ref="menu" @click="isOpenMenue = false">
         <a class="navbar-item" @click="changePage(0)"> 未完成 </a>
         <a class="navbar-item" @click="changePage(1)"> 已完成 </a>
+        <a class="navbar-item" @click="changePage(2)"> 全部 </a>
       </div>
     </div>
   </nav>
@@ -43,7 +44,7 @@ export default {
   },
   methods: {
     changePage() {
-      bus.$emit('change-page', 0); //0:未完成，1:已完成
+      bus.$emit('change-page', 0); //0:未完成，1:已完成，2：全部
     },
     closeOption(e) {
       this.isOpenMenue = false;
