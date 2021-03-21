@@ -1,18 +1,66 @@
 <template>
   <div id="app-content">
     <draggable
-      v-model="myArray"
-      group="people"
+      v-model="doneArray"
       v-bind="dragOptions"
       @start="drag = true"
       @end="drag = false"
       handle=".handle"
+      v-if="pageStatus === 1 || pageStatus === 2"
     >
       <transition-group type="transition" :name="!drag ? 'flip-list' : null">
-        <div class="block do-list-item" v-for="item in myArray" :key="item.id">
-          <div class="container">
+        <div
+          class="block do-list-item"
+          v-for="item in doneArray"
+          :key="item.id"
+        >
+          <div
+            class="container"
+            @touchstart="onMousedown(item.id)"
+            @touchmove="onMouseup"
+            @touchend="onMouseup"
+          >
             <div class="notification">
-              <radio-custom v-model="item.status"></radio-custom>
+              <radio-custom
+                :value="true"
+                @click.native="changeStatus(false, item.id)"
+              ></radio-custom>
+              <pre class="pre">{{ item.text }}</pre>
+              <textarea
+                class="textarea has-fixed-size is-small item-input"
+                v-model="item.text"
+              ></textarea>
+              <div class="drag-area handle"></div>
+            </div>
+          </div>
+        </div>
+      </transition-group>
+    </draggable>
+    <draggable
+      v-model="toDoArray"
+      v-bind="dragOptions"
+      @start="drag = true"
+      @end="drag = false"
+      handle=".handle"
+      v-if="pageStatus === 0 || pageStatus === 2"
+    >
+      <transition-group type="transition" :name="!drag ? 'flip-list' : null">
+        <div
+          class="block do-list-item"
+          v-for="item in toDoArray"
+          :key="item.id"
+        >
+          <div
+            class="container"
+            @touchstart="onMousedown(item.id)"
+            @touchmove="onMouseup"
+            @touchend="onMouseup"
+          >
+            <div class="notification">
+              <radio-custom
+                :value="false"
+                @click.native="changeStatus(true, item.id)"
+              ></radio-custom>
               <pre class="pre">{{ item.text }}</pre>
               <textarea
                 class="textarea has-fixed-size is-small item-input"
@@ -27,12 +75,19 @@
         </div>
       </transition-group>
     </draggable>
+    <drawer v-show="showDrawer">
+      <div class="drawer-item button has-text-danger" @click="delItem">
+        删除
+      </div>
+      <div class="drawer-item button" @click="showDrawer = false">取消</div>
+    </drawer>
   </div>
 </template>
 
 <script>
 import draggable from "vuedraggable";
 import radioCustom from "../elements/radio.vue";
+import drawer from "../elements/drawer.vue";
 import bus from "@/utils/bus";
 
 export default {
@@ -40,25 +95,31 @@ export default {
   components: {
     draggable,
     radioCustom,
+    drawer,
   },
   props: {
     msg: String,
   },
   data() {
     return {
-      myArray: [],
+      toDoArray: [],
+      doneArray: [],
       drag: false,
       activeItem: null,
+      pageStatus: 0, //0:未完成，1:已完成，2：全部
+      drawer: true,
+      direction: "btt",
+      targetId: null,
+      timer: null,
+      showDrawer: false,
     };
   },
   computed: {
     dragOptions() {
       return {
         animation: 200,
-        group: "description",
         disabled: false,
         ghostClass: "ghost",
-        pageStatus: 0, //0:未完成，1:已完成，2：全部
       };
     },
   },
@@ -66,31 +127,71 @@ export default {
   methods: {
     addItem() {
       const id = this.getNewId();
-      this.myArray.push({ id, status: false, text: "新事件" });
+      this.toDoArray.push({ id, text: "新事件" });
     },
-    delItem(index) {
-      this.myArray.splice(index, 1);
+    delItem() {
+      this.showDrawer = false;
+      for (let key in this.toDoArray) {
+        if (this.toDoArray[key].id === this.targetId) {
+          this.toDoArray.splice(key, 1);
+          return;
+        }
+      }
+      for (let key in this.doneArray) {
+        if (this.doneArray[key].id === this.targetId) {
+          this.doneArray.splice(key, 1);
+          return;
+        }
+      }
     },
     saveData() {
-      localStorage.setItem("myArray", JSON.stringify(this.myArray));
+      localStorage.setItem("toDoArray", JSON.stringify(this.toDoArray));
+      localStorage.setItem("doneArray", JSON.stringify(this.doneArray));
     },
     getNewId() {
       for (let i = 0; i < 10000; i++) {
         if (
-          !this.myArray.some((item) => {
-            item.id === i;
-          })
+          !this.toDoArray.some((item) => item.id === i) &&
+          !this.doneArray.some((item) => item.id === i)
         ) {
           return i;
         }
       }
     },
+    changeStatus(isDone, id) {
+      if (isDone) {
+        for (let key in this.toDoArray) {
+          if (this.toDoArray[key].id === id) {
+            this.doneArray.push(this.toDoArray[key]);
+            this.toDoArray.splice(key, 1);
+            break;
+          }
+        }
+      } else {
+        for (let key in this.doneArray) {
+          if (this.doneArray[key].id === id) {
+            this.toDoArray.push(this.doneArray[key]);
+            this.doneArray.splice(key, 1);
+            break;
+          }
+        }
+      }
+    },
+
+    onMousedown(id) {
+      this.timer = setTimeout(() => {
+        this.targetId = id;
+        this.showDrawer = true;
+      }, 1000);
+    },
+    onMouseup() {
+      console.log(2222);
+      clearTimeout(this.timer);
+    },
   },
   created() {
-    const data = JSON.parse(localStorage.getItem("myArray"));
-    if (data) {
-      this.myArray = data;
-    }
+    this.toDoArray = JSON.parse(localStorage.getItem("toDoArray")) || [];
+    this.doneArray = JSON.parse(localStorage.getItem("doneArray")) || [];
 
     window.removeEventListener("beforeunload", (e) => this.saveData(e));
     window.removeEventListener("unload", (e) => this.saveData(e));
@@ -175,6 +276,12 @@ export default {
       font-size: 1.2rem;
       width: 100%;
     }
+  }
+  .drawer-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 3rem;
   }
 }
 </style>
